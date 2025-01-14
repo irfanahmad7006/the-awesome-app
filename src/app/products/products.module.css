@@ -1,0 +1,9 @@
+.product{
+    background-color: slateblue;
+    border: 2px solid cadetblue;
+    margin: 7px;
+   padding: 7px; 
+   height: 250px;
+   width: 270px;
+
+border-radius: 15px;}

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from "react"
+import Message from "./Message";
 
 type CounterProps={
     intValue: number
@@ -24,6 +25,7 @@ function Counter(props: CounterProps){
             <h3>Counter Components: {counter}</h3>
             <button onClick={inc}>Increment</button>
             <button onClick={decr}>Decrement</button>
+            {counter >5 ? <Message text= {''+counter} color='blue'/>:null}
         </div>
 
     )
