@@ -5,12 +5,14 @@ import axios from "axios"
 import { useParams, useRouter } from "next/navigation"
 import { ChangeEvent, MouseEvent, useEffect, useState } from "react"
 
-
+const url = "http://localhost:9000/products/"
 export default function EditProductPage() {
     const params =useParams()
-    const [product, setProduct] = useState<Product>()
+    const [product, setProduct] = useState<Product>();
     const route = useRouter()
     const [name, setName] = useState(product?.name)
+    const [price, setPrice] = useState(product?.price)
+    const [desc, setDesc] = useState(product?.description)
 
     useEffect(()=>{
         fetchProduct();
@@ -22,8 +24,8 @@ export default function EditProductPage() {
 
     async function fetchProduct(){
         try {
-            const url = "http://localhost:9000/products/" +params.id
-            const response = await axios.get<Product>(url);
+            const newUrl = url +params.id
+            const response = await axios.get<Product>(newUrl);
             setProduct(response.data)
 
         } catch (error) {
@@ -31,8 +33,18 @@ export default function EditProductPage() {
         }
     }
 
-    function save(event: MouseEvent<HTMLButtonElement>){
+    async function save(event: MouseEvent<HTMLButtonElement>){
         event.preventDefault();
+        const newUrl = url +params.id;
+        try {
+            const response = await axios.put(url,{id:params.id,name:name,description:desc,price:price})
+            alert(response);
+            console.log("Updated the value", response)
+
+        } catch (error) {
+            alert(error);
+        }
+        
         route.push("/products");
     }
     function updateName(event: ChangeEvent<HTMLInputElement>){
@@ -51,17 +63,17 @@ export default function EditProductPage() {
             <form>
                 <div className="form-group">
                     <label htmlFor="name">Name</label>
-                    <input className="form-control" type="text" id="name" value={product?.name} onChange={evt => {setName(evt.target.value)}}/>
+                    <input className="form-control" type="text" id="name" value={name} onChange={evt => {setName(evt.target.value)}}/>
                 </div>
 
                 <div className="form-group">
                     <label htmlFor="price">Price</label>
-                    <input className="form-control" type="number" id="price" value={product?.price} />
+                    <input className="form-control" type="number" id="price" value={price} onChange={evt => {setPrice(Number(evt.target.value))}} />
                 </div>
 
                 <div className="form-group">
                     <label htmlFor="desc">Description</label>
-                    <input className="form-control" type="text" id="desc" value={product?.description} />
+                    <input className="form-control" type="text" id="desc" value={desc} onChange={evt => {setDesc(evt.target.value)}} />
                 </div>
 
                 <br />
