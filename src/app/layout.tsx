@@ -1,7 +1,10 @@
+
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Link from "next/link";
+import ReduxProvider from "@/redux/reduxProvider";
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,31 +29,34 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        <div className="container">
-          <nav className="navbar navbar-dark bg-dark">
-            <div className="container-fluid">
-              <Link className="navbar-brand" href="/">Next.js</Link>
-              <ul className="nav">
-                <li className="nav-item">
-                  <Link className="nav-link" href="/">Home</Link>
-                </li>
-                <li className="nav-item">
-                  <Link className="nav-link" href="/about">About</Link>
-                </li>
-                <li className="nav-item">
-                  <Link className="nav-link" href="/products">Products</Link>
-                </li>
-                <li className="nav-item">
-                  <Link className="nav-link" href="/login">Login</Link>
-                </li>
-              </ul>
+        <ReduxProvider>
+          <div className="container">
+            <nav className="navbar navbar-dark bg-dark">
+              <div className="container-fluid">
+                <Link className="navbar-brand" href="/">Next.js</Link>
+                <ul className="nav">
+                  <li className="nav-item">
+                    <Link className="nav-link" href="/">Home</Link>
+                  </li>
+                  <li className="nav-item">
+                    <Link className="nav-link" href="/about">About</Link>
+                  </li>
+                  <li className="nav-item">
+                    <Link className="nav-link" href="/products">Products</Link>
+                  </li>
+                  <li className="nav-item">
+                    <Link className="nav-link" href="/login">Login</Link>
+                  </li>
+                </ul>
 
-            </div>
-          </nav>
-          <main>
-            {children}
-          </main>
-        </div>
+              </div>
+            </nav>
+            <main>
+              {children}
+            </main>
+          </div>
+        </ReduxProvider>
+
       </body>
     </html>
   );

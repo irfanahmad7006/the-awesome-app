@@ -5,18 +5,31 @@ import axios from "axios"
 import { useEffect, useState } from "react"
 import classess from './products.module.css'
 import { useRouter } from "next/navigation"
+import {useSelector} from "react-redux"
+import { AppState } from "@/redux/store"
 
 export default function ListProducts() {
-    const url = "http://localhost:9000/products"
+    const url = "http://localhost:9000/secure_products"
+        // const url = "http://localhost:9000/products"
     const route = useRouter();
     const [products, setProducts] = useState<Product[]>([])
     useEffect(() => {
         fetchProducts()
     }, [])
 
+   const auth = useSelector((state: AppState)=> state.auth)
+
     async function fetchProducts() {
         try {
-            const response = await axios.get<Product[]>(url);
+
+            if(!auth.isAuthenticated){
+                route.push('/login')
+
+                return;
+            }
+
+            const headers = {"Authorization": `Bearer ${auth.accessToken}`};
+            const response = await axios.get<Product[]>(url,{headers});
             console.log("Fulfilled fecthporduct", response.data)
             setProducts(response.data)
         } catch (error) {
