@@ -1,85 +1,69 @@
-"use client"
+"use client";
 
-import { Product } from "@/model/product"
-import axios from "axios"
-import { useEffect, useState } from "react"
-import classess from './products.module.css'
-import { useRouter } from "next/navigation"
-import {useSelector} from "react-redux"
-import { AppState } from "@/redux/store"
+import { Product } from "@/model/product";
+import axios from "axios";
+
+import { useTitle } from "@/hooks/useTitle";
+import { useProducts } from "@/hooks/useProducts";
+import ProductView from "./ProductView";
+import { useState } from "react";
 
 export default function ListProducts() {
-    const url = "http://localhost:9000/secure_products"
-        // const url = "http://localhost:9000/products"
-    const route = useRouter();
-    const [products, setProducts] = useState<Product[]>([])
-    useEffect(() => {
-        fetchProducts()
-    }, [])
+  const url = "http://localhost:9000/secure_products";
+  // const url = "http://localhost:9000/products"
 
-   const auth = useSelector((state: AppState)=> state.auth)
+  useTitle("Products");
 
-    async function fetchProducts() {
-        try {
+  const { products, setProducts, auth, router } = useProducts(url);
+  const [isMessageVisible, setMessageVisible] = useState(false);
 
-            if(!auth.isAuthenticated){
-                route.push('/login')
+  async function deleteProduct(product: Product) {
+    try {
+      const deleteURL = url + "/" + product.id;
+      const deleteResponse = await axios.delete(deleteURL);
+      // await fetchProducts();
 
-                return;
-            }
-
-            const headers = {"Authorization": `Bearer ${auth.accessToken}`};
-            const response = await axios.get<Product[]>(url,{headers});
-            console.log("Fulfilled fecthporduct", response.data)
-            setProducts(response.data)
-        } catch (error) {
-            console.log("Fetch Product error", error)
-
-        }
+      //create a copy of products
+      const copy_of_products = [...products];
+      const index = copy_of_products.findIndex(
+        (item) => item.id === product.id
+      );
+      if (index !== -1) {
+        copy_of_products.splice(index, 1);
+        setProducts(copy_of_products);
+      }
+      alert("Deleted Sucessfully ID: " + product.id);
+    } catch (error) {
+      alert("Deletion Failed for  ID: " + error);
     }
+  }
 
-    async function deleteProduct(product: Product){
-        try {
-            const deleteURL = url+"/"+product.id;
-            const deleteResponse = await axios.delete(deleteURL)
-            // await fetchProducts();
+  function editProduct(prod: Product) {
+    router.push("/products/" + prod.id);
+  }
+  return (
+    <div>
+      <h4>Porducts List</h4>
 
-            //create a copy of products
-            const copy_of_products = [...products]
-            const index = copy_of_products.findIndex(item => item.id===product.id)
-            if(index !== -1){
-                copy_of_products.splice(index,1);
-                setProducts(copy_of_products)
-            }
-            alert("Deleted Sucessfully ID: "+product.id)
+      {isMessageVisible ? (
+        <div>This is a react page using axios and useState</div>
+      ) : null}
 
+      <div>
+        <button className="btn btn-info" onClick={()=>{ setMessageVisible(pValue => !pValue)}}>Show/Hide</button>
+      </div>
 
-        } catch (error) {
-            alert("Deletion Failed for  ID: "+error)
-        }
-
-    }
-
-    function editProduct(prod: Product){
-        route.push("/products/"+prod.id)
-    }
-    return (
-        <div>
-            <h4>Porducts List</h4>
-                <div style={{display: "flex", flexFlow: "row-wrap", justifyContent: "center"}}>
-                    {products.map(prod => {
-                        return (
-                            <div className={classess.product} key={prod.id}>
-                                <p>ID: {prod.id}</p>
-                                <p>Name: {prod.name}</p>
-                                <p>Description: {prod.description}</p>
-                                <p>Price: {prod.price}</p>
-                                <button className="btn btn-warning" onClick={()=>{deleteProduct(prod)}}>Delete</button>&nbsp;
-                                <button className="btn btn-primary" onClick={()=>{editProduct(prod)}}>Edit</button>
-                            </div>
-                        )
-                    })}
-                </div>
-        </div>
-    )
+      <div
+        style={{
+          display: "flex",
+          flexFlow: "row-wrap",
+          justifyContent: "center",
+        }}
+      >
+        {products.map((prod) => {
+          return <ProductView key={prod.id} data={prod} onDelete={deleteProduct} onEdit={editProduct} />;
+        })}
+      </div>
+    </div>
+  );
 }

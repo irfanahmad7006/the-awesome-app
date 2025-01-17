@@ -1,8 +1,9 @@
 'use client'
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useDispatch, UseDispatch } from "react-redux";
+import { useTitle } from "@/hooks/useTitle";
 
 export default function LoginPage() {
     const [username, setUsername] = useState("");
@@ -10,6 +11,13 @@ export default function LoginPage() {
     const [message, setMessage] = useState("");
     const route = useRouter();
     const dispatch = useDispatch();
+    const userNameInputRef= useRef<HTMLInputElement>(null)
+    useTitle('Login')
+
+    useEffect(()=>{
+        userNameInputRef.current?.focus;
+        
+    },[])
 
     function handleUsernameChange(evt: ChangeEvent<HTMLInputElement>) {
 
@@ -17,6 +25,7 @@ export default function LoginPage() {
         setUsername(value);
     }
     async function login() {
+        console.log("username from useRef: ", userNameInputRef.current?.value)
         if (!username && !password) {
             //alert("Enter the credentials")
             setMessage("Enter The Credentials")
@@ -71,7 +80,8 @@ export default function LoginPage() {
 
             <div className="form-group">
                 <label htmlFor="userName">User Name</label>
-                <input className="form-control" type="text" id="userName" value={username} onChange={handleUsernameChange} />
+                <input className="form-control" type="text" id="userName" value={username} 
+                    onChange={handleUsernameChange} ref={userNameInputRef} />
             </div>
 
             <div className="form-group">
